@@ -1,6 +1,7 @@
 //    B)    B:|
 
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'cover.dart';
 import 'barrier.dart';
@@ -18,11 +19,13 @@ class _HomePageState extends State<HomePage> {
   double initpos = birdY;
   double height = 0;
   double time = 0;
-  double gravity = -3.0;   //power of gravity
-  double velocity = 2.0;    //power of jump
+  double gravity = -2.5;   //power of gravity
+  double velocity = 1.5;    //power of jump
   double birdWidth = 0.1; // out of 2, 2 being the entire width of the screen
   double birdHeight = 0.1; // out of 2, 2 being the entire height of the screen
-
+  int totaltime = 0;
+  int score = 0;
+  int bestscore = 0;
   //game values
   bool started = false;
 
@@ -39,12 +42,25 @@ class _HomePageState extends State<HomePage> {
 
   void start(){
     started = true;
+    Timer.periodic(Duration(milliseconds: 1000),(timer) {
+      totaltime += 1;
+      //print("$totaltime");
+
+      if(birdded()){
+        timer.cancel();
+        totaltime = 0;
+      }
+    });
+
+
+
     Timer.periodic(Duration(milliseconds: 50), (timer) {
       height = gravity * time * time + velocity * time;
 
       setState(() {
         birdY = initpos - height;
       });
+
 
       //checks if bird is ded or not
       if(birdded()){
@@ -60,6 +76,8 @@ class _HomePageState extends State<HomePage> {
       time += 0.1;
     });
   }
+
+
 
   void moveit(){
     for (int i = 0; i < barrierX.length; i++) {
@@ -80,10 +98,14 @@ class _HomePageState extends State<HomePage> {
     //it's initial position
     Navigator.pop(context);
     setState(() {
+      if(score >= bestscore){
+        bestscore = score;
+      }
       birdY = 0;
       started = false;
       time = 0;
       initpos = birdY;
+      score = 0;
       barrierX = [2,2+1.5];
     });
   }
@@ -127,6 +149,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       time = 0;
       initpos = birdY;
+      score = totaltime;
     });
   }
 
@@ -222,14 +245,14 @@ class _HomePageState extends State<HomePage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              '0',
+                              '$score',
                               style: TextStyle(color: Colors.white, fontSize: 35),
                             ),
                             SizedBox(
                               height: 15,
                             ),
                             Text(
-                              'YOUR SCORE',
+                              'SCORE',
                               style: TextStyle(color: Colors.white, fontSize: 20),
                             ),
                           ],
@@ -238,14 +261,14 @@ class _HomePageState extends State<HomePage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              '99999',
+                              '$bestscore',
                               style: TextStyle(color: Colors.white, fontSize: 35),
                             ),
                             SizedBox(
                               height: 15,
                             ),
                             Text(
-                              'MY SCORE',
+                              'BEST SCORE',
                               style: TextStyle(color: Colors.white, fontSize: 20),
                             ),
                           ],
